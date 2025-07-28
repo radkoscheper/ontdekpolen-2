@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Search, Settings, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
+import TravelSlider from "@/components/ui/travel-slider";
 
 // Activities section component
 function ActivitiesSection({ pageTitle, setSelectedActivityId }: { pageTitle?: string, setSelectedActivityId: (id: string | null) => void }) {
@@ -31,7 +32,11 @@ function ActivitiesSection({ pageTitle, setSelectedActivityId }: { pageTitle?: s
       <h2 className="text-3xl font-bold mb-8 font-inter text-gray-900">
         Activiteiten in {pageTitle}
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <TravelSlider
+        visibleItems={{ mobile: 1, tablet: 2, desktop: 4 }}
+        showNavigation={true}
+        className="mx-auto"
+      >
         {locationActivities.map((activity: any) => {
           // Handler for activity click to show details in content section
           const handleActivityClick = (e: React.MouseEvent) => {
@@ -83,7 +88,7 @@ function ActivitiesSection({ pageTitle, setSelectedActivityId }: { pageTitle?: s
             </Card>
           );
         })}
-      </div>
+      </TravelSlider>
     </section>
   );
 }
@@ -214,14 +219,32 @@ export default function Page() {
   const { data: selectedActivity } = useQuery({
     queryKey: ['/api/activities', selectedActivityId],
     queryFn: async () => {
-      if (!selectedActivityId) return null;
-      const response = await fetch(`/api/admin/activities`);
+      if (!selectedActivityId || !page?.title) return null;
+      // Use the public location-specific API instead of admin API
+      const response = await fetch(`/api/activities/location/${encodeURIComponent(page.title)}`);
       if (!response.ok) throw new Error('Failed to fetch activities');
       const activities = await response.json();
       return activities.find((a: any) => a.id === parseInt(selectedActivityId));
     },
-    enabled: !!selectedActivityId,
+    enabled: !!selectedActivityId && !!page?.title,
   });
+
+  // Separate effect to handle scrolling when selectedActivity data is loaded
+  useEffect(() => {
+    if (selectedActivity && selectedActivityId) {
+      // Wait for content to render completely then scroll
+      setTimeout(() => {
+        const contentSection = document.getElementById('content-section');
+        if (contentSection) {
+          console.log('Scrolling to content section for activity:', selectedActivity.name);
+          contentSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }, 300);
+    }
+  }, [selectedActivity, selectedActivityId]);
 
   // Update document title and meta tags
   useEffect(() => {
