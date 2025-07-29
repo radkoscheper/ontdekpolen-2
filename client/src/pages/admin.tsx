@@ -19,6 +19,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { CreateHighlightDialog, EditHighlightDialog, ViewHighlightDialog, CreateDestinationDialog, CreateGuideDialog, CreateActivityDialog, EditActivityDialog, ViewActivityDialog } from '@/components/highlights-dialogs';
+import { DestinationImageManager } from '@/components/ui/cloudinary-destination-upload';
+import CloudinaryUpload from '@/components/ui/cloudinary-upload';
+import CloudinaryGallery from '@/components/ui/cloudinary-gallery';
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -126,9 +129,6 @@ export default function Admin() {
     enabled: isAuthenticated && currentUser?.canEditContent,
     retry: 1,
     staleTime: 0,
-    onError: (error) => {
-      toast({ title: "Fout", description: "Kon zoekconfiguratties niet laden", variant: "destructive" });
-    }
   });
 
   // Multi-platform deployment queries (admin only)
@@ -159,6 +159,8 @@ export default function Admin() {
   const [showEditUser, setShowEditUser] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [users, setUsers] = useState<any[]>([]);
+  const [galleryKey, setGalleryKey] = useState(0);
 
 
   
@@ -360,8 +362,8 @@ export default function Admin() {
 
   // Get unique locations from destinations for filter
   const getUniqueLocations = () => {
-    if (!destinationsQuery.data) return [];
-    const locations = destinationsQuery.data
+    if (!destinationsQuery.data || !Array.isArray(destinationsQuery.data)) return [];
+    const locations = (destinationsQuery.data as any[])
       .map((dest: any) => dest.location)
       .filter((location: string) => location && location.trim() !== '')
       .filter((location: string, index: number, arr: string[]) => arr.indexOf(location) === index)
@@ -371,8 +373,8 @@ export default function Admin() {
 
   // Get unique titles from guides for filter (first word)
   const getUniqueGuideCategories = () => {
-    if (!guidesQuery.data) return [];
-    const categories = guidesQuery.data
+    if (!guidesQuery.data || !Array.isArray(guidesQuery.data)) return [];
+    const categories = (guidesQuery.data as any[])
       .map((guide: any) => {
         const firstWord = guide.title.split(' ')[0];
         return firstWord || 'Overig';
@@ -384,16 +386,16 @@ export default function Admin() {
 
   // Filter destinations by location
   const getFilteredDestinations = () => {
-    if (!destinationsQuery.data) return [];
+    if (!destinationsQuery.data || !Array.isArray(destinationsQuery.data)) return [];
     if (locationFilter === 'all') return destinationsQuery.data;
-    return destinationsQuery.data.filter((dest: any) => dest.location === locationFilter);
+    return (destinationsQuery.data as any[]).filter((dest: any) => dest.location === locationFilter);
   };
 
   // Filter guides by category
   const getFilteredGuides = () => {
-    if (!guidesQuery.data) return [];
+    if (!guidesQuery.data || !Array.isArray(guidesQuery.data)) return [];
     if (guideFilter === 'all') return guidesQuery.data;
-    return guidesQuery.data.filter((guide: any) => {
+    return (guidesQuery.data as any[]).filter((guide: any) => {
       const firstWord = guide.title.split(' ')[0] || 'Overig';
       return firstWord === guideFilter;
     });
@@ -401,8 +403,8 @@ export default function Admin() {
 
   // Get unique locations from activities for filter
   const getUniqueActivityLocations = () => {
-    if (!activitiesQuery.data) return [];
-    const locations = activitiesQuery.data
+    if (!activitiesQuery.data || !Array.isArray(activitiesQuery.data)) return [];
+    const locations = (activitiesQuery.data as any[])
       .map((activity: any) => activity.location)
       .filter((location: string) => location && location.trim() !== '')
       .filter((location: string, index: number, arr: string[]) => arr.indexOf(location) === index)
@@ -470,7 +472,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (isAuthenticated && currentUser?.canManageUsers) {
-      loadUsers();
+      // User management queries handled by React Query
     }
   }, [isAuthenticated, currentUser]);
 
@@ -478,27 +480,28 @@ export default function Admin() {
   useEffect(() => {
     if (siteSettingsQuery.data) {
       console.log('Loading site settings from query:', siteSettingsQuery.data);
+      const data = siteSettingsQuery.data as any;
       const newSettings = {
-        siteName: siteSettingsQuery.data.siteName || '',
-        siteDescription: siteSettingsQuery.data.siteDescription || '',
-        metaKeywords: siteSettingsQuery.data.metaKeywords || '',
-        favicon: siteSettingsQuery.data.favicon || '',
-        faviconEnabled: siteSettingsQuery.data.faviconEnabled ?? true,
-        backgroundImage: siteSettingsQuery.data.backgroundImage || '',
-        backgroundImageAlt: siteSettingsQuery.data.backgroundImageAlt || '',
-        logoImage: siteSettingsQuery.data.logoImage || '',
-        logoImageAlt: siteSettingsQuery.data.logoImageAlt || '',
-        socialMediaImage: siteSettingsQuery.data.socialMediaImage || '',
-        headerOverlayEnabled: siteSettingsQuery.data.headerOverlayEnabled || false,
-        headerOverlayOpacity: siteSettingsQuery.data.headerOverlayOpacity || 30,
-        customCSS: siteSettingsQuery.data.customCSS || '',
-        customJS: siteSettingsQuery.data.customJS || '',
-        googleAnalyticsId: siteSettingsQuery.data.googleAnalyticsId || '',
-        showDestinations: siteSettingsQuery.data.showDestinations ?? true,
-        showMotivation: siteSettingsQuery.data.showMotivation ?? true,
-        showHighlights: siteSettingsQuery.data.showHighlights ?? true,
-        showOntdekMeer: siteSettingsQuery.data.showOntdekMeer ?? true,
-        showGuides: siteSettingsQuery.data.showGuides ?? true,
+        siteName: data.siteName || '',
+        siteDescription: data.siteDescription || '',
+        metaKeywords: data.metaKeywords || '',
+        favicon: data.favicon || '',
+        faviconEnabled: data.faviconEnabled ?? true,
+        backgroundImage: data.backgroundImage || '',
+        backgroundImageAlt: data.backgroundImageAlt || '',
+        logoImage: data.logoImage || '',
+        logoImageAlt: data.logoImageAlt || '',
+        socialMediaImage: data.socialMediaImage || '',
+        headerOverlayEnabled: data.headerOverlayEnabled || false,
+        headerOverlayOpacity: data.headerOverlayOpacity || 30,
+        customCSS: data.customCSS || '',
+        customJS: data.customJS || '',
+        googleAnalyticsId: data.googleAnalyticsId || '',
+        showDestinations: data.showDestinations ?? true,
+        showMotivation: data.showMotivation ?? true,
+        showHighlights: data.showHighlights ?? true,
+        showOntdekMeer: data.showOntdekMeer ?? true,
+        showGuides: data.showGuides ?? true,
       };
       console.log('Setting new site settings state:', newSettings);
       setSiteSettings(newSettings);
@@ -508,13 +511,14 @@ export default function Admin() {
   // Load motivation data when query updates
   useEffect(() => {
     if (motivationQuery.data) {
+      const data = motivationQuery.data as any;
       setMotivationData({
-        title: motivationQuery.data.title || '',
-        description: motivationQuery.data.description || '',
-        buttonText: motivationQuery.data.button_text || '',
-        buttonAction: motivationQuery.data.button_action || '',
-        image: motivationQuery.data.image || '',
-        isPublished: motivationQuery.data.is_published ?? true
+        title: data.title || '',
+        description: data.description || '',
+        buttonText: data.button_text || '',
+        buttonAction: data.button_action || '',
+        image: data.image || '',
+        isPublished: data.is_published ?? true
       });
     }
   }, [motivationQuery.data]);
@@ -712,13 +716,13 @@ export default function Admin() {
   };
 
   const handleEmptyImageTrash = async () => {
-    if (!trashedImagesQuery.data || trashedImagesQuery.data.length === 0) return;
+    if (!trashedImagesQuery.data || !Array.isArray(trashedImagesQuery.data) || (trashedImagesQuery.data as any[]).length === 0) return;
     
-    const confirmDelete = confirm(`Weet je zeker dat je alle ${trashedImagesQuery.data.length} afbeeldingen permanent wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`);
+    const confirmDelete = confirm(`Weet je zeker dat je alle ${(trashedImagesQuery.data as any[]).length} afbeeldingen permanent wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`);
     if (!confirmDelete) return;
     
     try {
-      for (const image of trashedImagesQuery.data) {
+      for (const image of (trashedImagesQuery.data as any[])) {
         await fetch(`/api/admin/images/trash/${image.trashName}`, {
           method: 'DELETE',
           credentials: 'include',
@@ -7181,7 +7185,7 @@ function ResetPasswordDialog({ open, onOpenChange, user, onPasswordReset }: {
   );
 }
 
-// Component voor bestemming bewerken
+// Component voor bestemming bewerken met Cloudinary integratie
 function EditDestinationDialog({ open, onOpenChange, destination, editData, setEditData, onSave }: { 
   open: boolean; 
   onOpenChange: (open: boolean) => void;
@@ -7190,6 +7194,7 @@ function EditDestinationDialog({ open, onOpenChange, destination, editData, setE
   setEditData: (data: any) => void;
   onSave: () => void;
 }) {
+  const [galleryKey, setGalleryKey] = useState(0);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -7215,123 +7220,390 @@ function EditDestinationDialog({ open, onOpenChange, destination, editData, setE
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Bestemming Bewerken</DialogTitle>
+          <DialogTitle>🏔️ {destination?.name} Bewerken</DialogTitle>
           <DialogDescription>
-            Bewerk de gegevens van {destination?.name}
+            Bewerk details en upload afbeeldingen via Cloudinary
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Naam</Label>
-            <Input
-              id="name"
-              value={editData.name}
-              onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="location">Plaats/Locatie</Label>
-            <Input
-              id="location"
-              value={editData.location || ''}
-              onChange={(e) => setEditData({ ...editData, location: e.target.value })}
-              placeholder="Bijv. Krakow, Warschau"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="ranking">Ranking (volgorde - lagere nummers eerst)</Label>
-            <Input
-              id="ranking"
-              type="number"
-              value={editData.ranking || 0}
-              onChange={(e) => setEditData({ ...editData, ranking: parseInt(e.target.value) || 0 })}
-              placeholder="0"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Beschrijving</Label>
-            <Textarea
-              id="description"
-              value={editData.description}
-              onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-              required
-            />
-          </div>
-          <ImageUploadField
-            label="Afbeelding"
-            value={editData.image}
-            onChange={(value) => setEditData({ ...editData, image: value })}
-            placeholder="/images/destinations/bestemming.jpg"
-            fileName={editData.name}
-            destination="destinations"
-          />
-          <div className="space-y-2">
-            <Label htmlFor="alt">Alt-tekst</Label>
-            <Input
-              id="alt"
-              value={editData.alt}
-              onChange={(e) => setEditData({ ...editData, alt: e.target.value })}
-              placeholder="Beschrijving van de afbeelding"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="content">Content (Markdown)</Label>
-            <Textarea
-              id="content"
-              className="min-h-32"
-              value={editData.content}
-              onChange={(e) => setEditData({ ...editData, content: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="link">Link (optioneel)</Label>
-            <Input
-              id="link"
-              value={editData.link || ''}
-              onChange={(e) => setEditData({ ...editData, link: e.target.value })}
-              placeholder="Bijv. /krakow-bezoeken of https://example.com"
-            />
-            <p className="text-sm text-gray-500">
-              Link waar de afbeelding naartoe moet leiden. Gebruik interne links (bijv. /pagina) of externe links (bijv. https://website.com)
-            </p>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex items-center space-x-2">
-              <Switch 
-                id="featured"
-                checked={editData.featured}
-                onCheckedChange={(checked) => setEditData({ ...editData, featured: checked })}
-              />
-              <Label htmlFor="featured">Featured</Label>
+        
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid grid-cols-4 w-full">
+            <TabsTrigger value="details">📝 Details</TabsTrigger>
+            <TabsTrigger value="images">🖼️ Cloudinary</TabsTrigger>
+            <TabsTrigger value="editor">✏️ Rich Text</TabsTrigger>
+            <TabsTrigger value="seo">🔍 SEO & Meta</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details" className="mt-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Naam *</Label>
+                  <Input
+                    id="name"
+                    value={editData.name}
+                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="location">Plaats/Locatie</Label>
+                  <Input
+                    id="location"
+                    value={editData.location || ''}
+                    onChange={(e) => setEditData({ ...editData, location: e.target.value })}
+                    placeholder="Bijv. Krakow, Warschau"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Beschrijving *</Label>
+                <Textarea
+                  id="description"
+                  value={editData.description}
+                  onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                  required
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="content">Uitgebreide Beschrijving (Markdown)</Label>
+                <Textarea
+                  id="content"
+                  className="min-h-32"
+                  value={editData.content}
+                  onChange={(e) => setEditData({ ...editData, content: e.target.value })}
+                  placeholder="Gebruik Markdown voor opmaak..."
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="link">Link naar pagina</Label>
+                  <Input
+                    id="link"
+                    value={editData.link || ''}
+                    onChange={(e) => setEditData({ ...editData, link: e.target.value })}
+                    placeholder="/krakow-ontdekken"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ranking">Ranking</Label>
+                  <Input
+                    id="ranking"
+                    type="number"
+                    value={editData.ranking || 0}
+                    onChange={(e) => setEditData({ ...editData, ranking: parseInt(e.target.value) || 0 })}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="alt">Alt-tekst</Label>
+                <Input
+                  id="alt"
+                  value={editData.alt}
+                  onChange={(e) => setEditData({ ...editData, alt: e.target.value })}
+                  placeholder="Beschrijving van de afbeelding"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 p-4 border rounded-lg bg-gray-50">
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="featured"
+                    checked={editData.featured}
+                    onCheckedChange={(checked) => setEditData({ ...editData, featured: checked })}
+                  />
+                  <Label htmlFor="featured">⭐ Featured</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="published"
+                    checked={editData.published}
+                    onCheckedChange={(checked) => setEditData({ ...editData, published: checked })}
+                  />
+                  <Label htmlFor="published">✅ Gepubliceerd</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="showOnHomepage"
+                    checked={editData.showOnHomepage !== false}
+                    onCheckedChange={(checked) => setEditData({ ...editData, showOnHomepage: checked })}
+                  />
+                  <Label htmlFor="showOnHomepage">🏠 Homepage</Label>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                  Annuleren
+                </Button>
+                <Button type="submit">💾 Opslaan</Button>
+              </DialogFooter>
+            </form>
+          </TabsContent>
+
+          <TabsContent value="images" className="mt-6">
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">📤 Upload Nieuwe Afbeelding</h3>
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  <CloudinaryUpload
+                    folder="ontdek-polen"
+                    destinationName={destination?.name}
+                    transformations={{
+                      width: 1200,
+                      height: 480,
+                      crop: 'fill',
+                      quality: 'auto:good',
+                    }}
+                    onUploadSuccess={async (result: any) => {
+                      toast({
+                        title: 'Upload succesvol',
+                        description: `Header afbeelding geüpload voor ${destination?.name}`,
+                      });
+                      
+                      // Update the edit form with new image URL
+                      const newImageUrl = result.data.secure_url;
+                      setEditData({ ...editData, image: newImageUrl });
+                      
+                      // Immediately save to database
+                      try {
+                        await apiRequest(`/api/destinations/${destination.id}`, {
+                          method: 'PUT',
+                          body: JSON.stringify({ ...editData, image: newImageUrl })
+                        });
+                        
+                        // Invalidate cache to refresh data
+                        queryClient.invalidateQueries({ queryKey: ['/api/admin/destinations'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/destinations'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/destinations/homepage'] });
+                        
+                        toast({
+                          title: 'Database bijgewerkt',
+                          description: 'Afbeelding is opgeslagen in de database',
+                        });
+                      } catch (error) {
+                        console.error('Error updating database:', error);
+                        toast({
+                          title: 'Database fout',
+                          description: 'Afbeelding geüpload maar niet opgeslagen in database',
+                          variant: 'destructive'
+                        });
+                      }
+                      
+                      // Force gallery refresh by triggering a re-render with key prop change
+                      setGalleryKey(Date.now());
+                    }}
+                  />
+                </div>
+                
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-medium text-blue-800 mb-2">🔄 Automatische Updates</h4>
+                  <p className="text-xs text-blue-700">
+                    Na upload wordt de afbeelding automatisch ingesteld als header afbeelding. 
+                    De gallery toont alle beschikbare afbeeldingen voor deze bestemming.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">🖼️ Afbeelding Gallery</h3>
+                <div className="border rounded-lg p-6 bg-gray-50 max-h-[700px] overflow-y-auto">
+                  <CloudinaryGallery
+                    key={galleryKey}
+                    folder="ontdek-polen"
+                    destinationName={destination?.name}
+                    showCategoryFilter={true}
+                    onImageSelect={async (image: any) => {
+                      const newImageUrl = image.secure_url;
+                      setEditData({ ...editData, image: newImageUrl });
+                      
+                      // Immediately save to database
+                      try {
+                        await apiRequest(`/api/destinations/${destination.id}`, {
+                          method: 'PUT',
+                          body: JSON.stringify({ ...editData, image: newImageUrl })
+                        });
+                        
+                        // Invalidate cache to refresh data
+                        queryClient.invalidateQueries({ queryKey: ['/api/admin/destinations'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/destinations'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/destinations/homepage'] });
+                        
+                        toast({
+                          title: 'Afbeelding geselecteerd',
+                          description: `${image.public_id} is nu de header afbeelding en opgeslagen`,
+                        });
+                      } catch (error) {
+                        console.error('Error updating database:', error);
+                        toast({
+                          title: 'Selectie fout',
+                          description: 'Afbeelding geselecteerd maar niet opgeslagen in database',
+                          variant: 'destructive'
+                        });
+                      }
+                    }}
+                    maxItems={20}
+                  />
+                </div>
+                
+                <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                  <h4 className="font-medium text-green-800 mb-2">💡 Gallery Tips</h4>
+                  <p className="text-xs text-green-700">
+                    Klik op een afbeelding om deze als header in te stellen. 
+                    Gebruik de delete knop om afbeeldingen permanent te verwijderen.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Switch 
-                id="published"
-                checked={editData.published}
-                onCheckedChange={(checked) => setEditData({ ...editData, published: checked })}
-              />
-              <Label htmlFor="published">Gepubliceerd</Label>
+
+            {editData.image && (
+              <div className="mt-6 space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">🎯 Huidige Header Preview</h3>
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  <img 
+                    src={editData.image} 
+                    alt={`${destination?.name} header preview`}
+                    className="w-full h-48 object-cover rounded border"
+                  />
+                  <p className="text-sm text-gray-600 mt-2">
+                    URL: {editData.image}
+                  </p>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="editor" className="mt-6">
+            <div className="space-y-6">
+              <div className="border rounded-lg p-6 bg-gradient-to-br from-blue-50 to-indigo-100">
+                <h3 className="text-lg font-semibold mb-4 text-blue-900">✏️ Rich Text Editor (Coming Soon)</h3>
+                <div className="space-y-4">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-blue-200">
+                    <h4 className="font-medium text-blue-800 mb-2">📝 TinyMCE Integration</h4>
+                    <p className="text-sm text-blue-700 mb-3">
+                      Professional WYSIWYG editor voor uitgebreide content formatting
+                    </p>
+                    <div className="flex items-center space-x-2 text-xs text-blue-600">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <span>Bold, Italic, Underline</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-xs text-blue-600">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <span>Headers, Lists, Links</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-xs text-blue-600">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <span>Image Embedding & Tables</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-green-200">
+                    <h4 className="font-medium text-green-800 mb-2">📊 Quill Editor Alternative</h4>
+                    <p className="text-sm text-green-700 mb-3">
+                      Lightweight rich text editor met moderne interface
+                    </p>
+                    <div className="flex items-center space-x-2 text-xs text-green-600">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <span>Clean UI & Fast Performance</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-purple-200">
+                    <h4 className="font-medium text-purple-800 mb-2">🎨 Custom Styling Tools</h4>
+                    <p className="text-sm text-purple-700 mb-3">
+                      Maatwerk styling voor Polish travel content
+                    </p>
+                    <div className="flex items-center space-x-2 text-xs text-purple-600">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                      <span>Travel-specific templates</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-300">
+                  <p className="text-xs text-blue-800">
+                    💡 <strong>Voor nu:</strong> Gebruik de Markdown editor in Details tab voor content formatting
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Switch 
-                id="showOnHomepage"
-                checked={editData.showOnHomepage !== false}
-                onCheckedChange={(checked) => setEditData({ ...editData, showOnHomepage: checked })}
-              />
-              <Label htmlFor="showOnHomepage">Toon op Homepage</Label>
+          </TabsContent>
+
+          <TabsContent value="seo" className="mt-6">
+            <div className="space-y-6">
+              <div className="border rounded-lg p-6 bg-gradient-to-br from-green-50 to-emerald-100">
+                <h3 className="text-lg font-semibold mb-4 text-green-900">🔍 SEO & Meta Data Tools</h3>
+                <div className="space-y-4">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-green-200">
+                    <h4 className="font-medium text-green-800 mb-2">📊 SEO Analytics</h4>
+                    <p className="text-sm text-green-700 mb-3">
+                      Analyseer content voor SEO optimalisatie
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                      <div className="bg-green-50 p-3 rounded border">
+                        <div className="text-sm font-medium text-green-800">Meta Title</div>
+                        <div className="text-xs text-green-600 mt-1">
+                          {editData.name ? `"${editData.name} - Ontdek Polen"` : 'Nog geen titel'}
+                        </div>
+                      </div>
+                      <div className="bg-green-50 p-3 rounded border">
+                        <div className="text-sm font-medium text-green-800">Description Length</div>
+                        <div className="text-xs text-green-600 mt-1">
+                          {editData.description?.length || 0} karakters
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-blue-200">
+                    <h4 className="font-medium text-blue-800 mb-2">🌐 Schema Markup</h4>
+                    <p className="text-sm text-blue-700 mb-3">
+                      Automatische structured data voor search engines
+                    </p>
+                    <div className="flex items-center space-x-2 text-xs text-blue-600">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <span>TouristDestination Schema</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-xs text-blue-600">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <span>LocalBusiness Integration</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-orange-200">
+                    <h4 className="font-medium text-orange-800 mb-2">📈 Performance Tools</h4>
+                    <p className="text-sm text-orange-700 mb-3">
+                      Page speed en Core Web Vitals monitoring
+                    </p>
+                    <div className="flex items-center space-x-2 text-xs text-orange-600">
+                      <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                      <span>Image optimization checks</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-xs text-orange-600">
+                      <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                      <span>Mobile-first scoring</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 p-3 bg-green-100 rounded-lg border border-green-300">
+                  <p className="text-xs text-green-800">
+                    💡 <strong>Huidige SEO:</strong> Automatische meta tags worden gegenereerd op basis van naam en beschrijving
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Annuleren
-            </Button>
-            <Button type="submit">Opslaan</Button>
-          </DialogFooter>
-        </form>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
