@@ -1,52 +1,37 @@
+#!/usr/bin/env node
+
+// Production build script voor Vercel deployment
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-console.log('🚀 Starting production build...');
+console.log('🏗️  Starting production build...');
 
 try {
-  // Step 1: Build the client (React app)
-  console.log('📦 Building client...');
-  execSync('vite build', { stdio: 'inherit' });
-
-  // Step 2: Build the server (Express API)
-  console.log('⚙️ Building server...');
-  execSync('esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist', { stdio: 'inherit' });
-
-  // Step 3: Ensure API directory exists for Vercel
-  const apiDir = path.join('dist', 'public', 'api');
-  if (!fs.existsSync(apiDir)) {
-    fs.mkdirSync(apiDir, { recursive: true });
-  }
-
-  // Step 4: Copy server bundle to API endpoint
-  const serverSource = path.join('dist', 'index.js');
-  const serverDest = path.join('dist', 'public', 'api', 'index.js');
+  // Build de client met npx vite
+  console.log('📦 Building client with Vite...');
+  execSync('npx vite build', { stdio: 'inherit' });
   
-  if (fs.existsSync(serverSource)) {
-    fs.copyFileSync(serverSource, serverDest);
-    console.log('✅ Server bundle copied to API endpoint');
+  // Build de server met npx esbuild
+  console.log('📦 Building server with esbuild...');
+  execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist', { stdio: 'inherit' });
+  
+  // Check of alle bestanden zijn aangemaakt
+  const distExists = fs.existsSync('dist');
+  const publicExists = fs.existsSync('dist/public');
+  const indexExists = fs.existsSync('dist/public/index.html');
+  const serverExists = fs.existsSync('dist/index.js');
+  
+  if (!distExists || !publicExists || !indexExists || !serverExists) {
+    throw new Error('Build output is incomplete');
   }
-
-  // Step 5: Verify build output
-  const buildFiles = [
-    'dist/public/index.html',
-    'dist/public/api/index.js'
-  ];
-
-  let totalSize = 0;
-  buildFiles.forEach(file => {
-    if (fs.existsSync(file)) {
-      const stats = fs.statSync(file);
-      const sizeKB = Math.round(stats.size / 1024);
-      console.log(`✅ ${file} (${sizeKB}KB)`);
-      totalSize += sizeKB;
-    } else {
-      console.warn(`⚠️ Missing: ${file}`);
-    }
-  });
-
-  console.log(`🎉 Build completed successfully! Total: ${totalSize}KB`);
+  
+  console.log('✅ Build completed successfully!');
+  console.log('📁 Generated files:');
+  console.log('   - dist/public/index.html (React app)');
+  console.log('   - dist/public/assets/ (CSS & JS)');
+  console.log('   - dist/index.js (Express server)');
+  console.log('   - dist/public/images/ (Static assets)');
   
 } catch (error) {
   console.error('❌ Build failed:', error.message);

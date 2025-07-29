@@ -1,18 +1,17 @@
 {
   "version": 2,
-  "buildCommand": "npm run build && node postbuild.js",
+  "buildCommand": "node build-vercel.js",
   "outputDirectory": "dist/public",
   "installCommand": "npm install",
   "framework": null,
-
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index"
+      "source": "/api/(.*)",
+      "destination": "/api/index"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
