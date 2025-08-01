@@ -1,0 +1,590 @@
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ontdek Polen - Jouw Reisgids naar Polen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2f3e46',
+                        sage: '#84a98c',
+                        cream: '#f8f6f1',
+                        charcoal: '#1f1f1f'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-cream font-inter text-charcoal">
+    <!-- @COMPONENT: Header -->
+    <header class="bg-primary text-white py-4 sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <nav class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-mountain text-2xl"></i>
+                    <h1 class="text-2xl font-bold">Ontdek Polen</h1>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#" class="hover:text-sage transition-colors">Bestemmingen</a>
+                    <a href="#" class="hover:text-sage transition-colors">Reisgidsen</a>
+                    <a href="#" class="hover:text-sage transition-colors">Tips</a>
+                    <a href="#" class="hover:text-sage transition-colors">Contact</a>
+                </div>
+                <button class="md:hidden">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <!-- @COMPONENT: Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center">
+        <!-- Historic Krakow old town square with colorful buildings and horse carriages -->
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&h=1080');"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+        
+        <div class="relative z-10 text-center text-white px-4 max-w-4xl">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                Ontdek de Verborgen <br class="hidden md:block">
+                <span class="text-sage">Schatten van Polen</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 font-light">
+                Van historische steden tot adembenemende natuur - 
+                <br class="hidden md:block">jouw perfecte Poolse avontuur begint hier
+            </p>
+            
+            <!-- @COMPONENT: Search Bar -->
+            <div class="bg-white rounded-full p-2 max-w-2xl mx-auto mb-8 shadow-2xl">
+                <div class="flex flex-col md:flex-row gap-2">
+                    <div class="flex-1 px-4 py-3">
+                        <input 
+                            type="text" 
+                            placeholder="Waar wil je naartoe in Polen?"
+                            class="w-full text-charcoal placeholder-gray-500 border-none outline-none text-lg"
+                            data-mock="true"
+                        >
+                    </div>
+                    <div class="flex-1 px-4 py-3 border-l border-gray-200">
+                        <input 
+                            type="date" 
+                            class="w-full text-charcoal border-none outline-none text-lg"
+                            data-mock="true"
+                        >
+                    </div>
+                    <button class="bg-primary text-white px-8 py-3 rounded-full hover:bg-sage transition-colors font-semibold">
+                        <i class="fas fa-search mr-2"></i>
+                        Zoeken
+                    </button>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: Search Bar -->
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="bg-sage text-white px-8 py-4 rounded-full hover:bg-primary transition-colors font-semibold text-lg">
+                    <i class="fas fa-map-marked-alt mr-2"></i>
+                    Plan je reis
+                </button>
+                <button class="border-2 border-white text-white px-8 py-4 rounded-full hover:bg-white hover:text-primary transition-colors font-semibold text-lg">
+                    <i class="fas fa-play mr-2"></i>
+                    Bekijk video
+                </button>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Hero Section -->
+
+    <!-- @COMPONENT: Popular Destinations -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-charcoal mb-4">
+                    Populaire Bestemmingen
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Ontdek de meest geliefde plekken in Polen, van levendige steden tot natuurlijke wonderen
+                </p>
+            </div>
+            
+            <!-- @MAP: destinations.map(destination => ( -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="group cursor-pointer">
+                    <!-- Historic Krakow main square with St. Mary's Basilica and colorful buildings -->
+                    <div class="relative overflow-hidden rounded-2xl mb-4 shadow-lg">
+                        <img 
+                            src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600" 
+                            alt="Historic Krakow main square" 
+                            class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <h3 class="text-2xl font-bold">Krakow</h3>
+                            <p class="text-sm opacity-90">Historische parel</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="group cursor-pointer">
+                    <!-- Tatra Mountains with snow-capped peaks and alpine lakes -->
+                    <div class="relative overflow-hidden rounded-2xl mb-4 shadow-lg">
+                        <img 
+                            src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600" 
+                            alt="Tatra Mountains with snow peaks" 
+                            class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <h3 class="text-2xl font-bold">Tatra Bergen</h3>
+                            <p class="text-sm opacity-90">Natuurlijke schoonheid</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="group cursor-pointer">
+                    <!-- Gdansk colorful historic houses along the Motlawa River -->
+                    <div class="relative overflow-hidden rounded-2xl mb-4 shadow-lg">
+                        <img 
+                            src="https://pixabay.com/get/gc48848a5e72e70f9dcfec24b9c65df149f31f1c59338d24fbeb07f470cab4286d213ae62196d57b1d3f8dbc20e3e3f7911d5dcda653fa3fcfe47be7722f15645_1280.jpg" 
+                            alt="Gdansk colorful waterfront buildings" 
+                            class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <h3 class="text-2xl font-bold">Gdansk</h3>
+                            <p class="text-sm opacity-90">Zeestad charme</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="group cursor-pointer">
+                    <!-- Bialowieza Forest with ancient trees and wildlife -->
+                    <div class="relative overflow-hidden rounded-2xl mb-4 shadow-lg">
+                        <img 
+                            src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600" 
+                            alt="Ancient forest with tall trees" 
+                            class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <h3 class="text-2xl font-bold">Bialowieza</h3>
+                            <p class="text-sm opacity-90">Oerbos avontuur</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_MAP )) -->
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Popular Destinations -->
+
+    <!-- @COMPONENT: Why Choose Poland -->
+    <section class="py-20 bg-cream">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-charcoal mb-6">
+                        Waarom <span class="text-sage">Polen</span> jouw volgende bestemming moet zijn
+                    </h2>
+                    <p class="text-xl text-gray-600 mb-8">
+                        Polen biedt een perfecte mix van geschiedenis, cultuur en natuur. 
+                        Van middeleeuwse kastelen tot moderne steden, van bergtoppen tot 
+                        kustlijnen - er is voor ieder wat wils.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-sage text-white p-3 rounded-full">
+                                <i class="fas fa-clock text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Rijke Geschiedenis</h3>
+                                <p class="text-gray-600">Ontdek eeuwenoude kastelen, historische steden en fascinerende musea</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-sage text-white p-3 rounded-full">
+                                <i class="fas fa-mountain text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Gevarieerde Natuur</h3>
+                                <p class="text-gray-600">Van de Tatra Bergen tot de Baltische kust en oerbossen</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-sage text-white p-3 rounded-full">
+                                <i class="fas fa-utensils text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Heerlijke Keuken</h3>
+                                <p class="text-gray-600">Proef authentieke pierogi, kielbasa en andere lokale specialiteiten</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="mt-8 bg-primary text-white px-8 py-4 rounded-full hover:bg-sage transition-colors font-semibold text-lg">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Meer ontdekken
+                    </button>
+                </div>
+                
+                <div class="relative">
+                    <!-- Polish mountain landscape with traditional wooden houses -->
+                    <img 
+                        src="https://pixabay.com/get/gd55d4582a96720a55dc0838b6bf4b6f62ae5997f0faa88afd63e5832da9325a26961d5e9aa8625ae7a67560c2e60eb07a0655559dca8c6a49fe159e91919b972_1280.jpg" 
+                        alt="Polish mountain village with traditional architecture" 
+                        class="rounded-2xl shadow-2xl"
+                    />
+                    <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-lg">
+                        <div class="flex items-center space-x-2">
+                            <div class="flex -space-x-2">
+                                <div class="w-8 h-8 bg-sage rounded-full border-2 border-white"></div>
+                                <div class="w-8 h-8 bg-primary rounded-full border-2 border-white"></div>
+                                <div class="w-8 h-8 bg-yellow-500 rounded-full border-2 border-white"></div>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-semibold">10.000+ reizigers</p>
+                                <p class="text-gray-600">hebben Polen ontdekt</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Why Choose Poland -->
+
+    <!-- @COMPONENT: Travel Guides -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-charcoal mb-4">
+                    Reisgidsen & Tips
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Gedetailleerde gidsen en insider tips om het meeste uit je Polen reis te halen
+                </p>
+            </div>
+            
+            <!-- @MAP: guides.map(guide => ( -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <article class="bg-cream rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                    <!-- Krakow old town market square with horse carriages and historic buildings -->
+                    <img 
+                        src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600" 
+                        alt="Krakow market square with historic buildings" 
+                        class="w-full h-48 object-cover"
+                    />
+                    <div class="p-6">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="bg-sage text-white px-3 py-1 rounded-full text-sm">Stadsgids</span>
+                            <span class="text-gray-500 text-sm">
+                                <i class="fas fa-clock mr-1"></i>
+                                3 dagen
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">3 Dagen in Krakow</h3>
+                        <p class="text-gray-600 mb-4">
+                            Ontdek de highlights van Krakow in een perfect 3-daags programma. 
+                            Van de Wawel kathedraal tot de levendige Kazimierz wijk.
+                        </p>
+                        <a href="#" class="text-primary hover:text-sage transition-colors font-semibold">
+                            Lees meer <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </article>
+                
+                <article class="bg-cream rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                    <!-- Scenic road through Polish countryside with rolling hills -->
+                    <img 
+                        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600" 
+                        alt="Scenic countryside road in Poland" 
+                        class="w-full h-48 object-cover"
+                    />
+                    <div class="p-6">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="bg-primary text-white px-3 py-1 rounded-full text-sm">Roadtrip</span>
+                            <span class="text-gray-500 text-sm">
+                                <i class="fas fa-clock mr-1"></i>
+                                10 dagen
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Roadtrip door Zuid-Polen</h3>
+                        <p class="text-gray-600 mb-4">
+                            Een epische roadtrip langs de mooiste plekken van Zuid-Polen. 
+                            Van bergen tot kastelen, dit is de ultieme reis.
+                        </p>
+                        <a href="#" class="text-primary hover:text-sage transition-colors font-semibold">
+                            Lees meer <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </article>
+                
+                <article class="bg-cream rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                    <!-- Baltic Sea coast with sandy beaches and dunes -->
+                    <img 
+                        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600" 
+                        alt="Baltic Sea coastline with sandy beaches" 
+                        class="w-full h-48 object-cover"
+                    />
+                    <div class="p-6">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Kustgids</span>
+                            <span class="text-gray-500 text-sm">
+                                <i class="fas fa-clock mr-1"></i>
+                                5 dagen
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Verborgen Parels aan de Kust</h3>
+                        <p class="text-gray-600 mb-4">
+                            Ontdek de mooiste strandsteden en verborgen baaien langs 
+                            de Poolse kust. Van Gdansk tot Sopot.
+                        </p>
+                        <a href="#" class="text-primary hover:text-sage transition-colors font-semibold">
+                            Lees meer <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </article>
+            </div>
+            <!-- @END_MAP )) -->
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Travel Guides -->
+
+    <!-- @COMPONENT: Testimonials -->
+    <section class="py-20 bg-primary text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    Wat Reizigers Zeggen
+                </h2>
+                <p class="text-xl opacity-90 max-w-2xl mx-auto">
+                    Ervaringen van reizigers die Polen hebben ontdekt met onze gidsen
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white bg-opacity-10 rounded-2xl p-8 backdrop-blur-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-400 text-xl">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-lg mb-6 italic">
+                        "De Krakow gids was fantastisch! We hebben alle highlights gezien 
+                        en ook enkele verborgen parels ontdekt. Absoluut een aanrader!"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-sage rounded-full flex items-center justify-center mr-4">
+                            <span class="font-bold text-white">MJ</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Maria Janssen</p>
+                            <p class="opacity-80">Amsterdam</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-2xl p-8 backdrop-blur-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-400 text-xl">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-lg mb-6 italic">
+                        "De roadtrip door Zuid-Polen was onvergetelijk. Perfect gepland 
+                        en vol met prachtige stops. Polen is echt een verborgen parel!"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-sage rounded-full flex items-center justify-center mr-4">
+                            <span class="font-bold text-white">PV</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Pieter van der Berg</p>
+                            <p class="opacity-80">Utrecht</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-2xl p-8 backdrop-blur-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-400 text-xl">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="text-lg mb-6 italic">
+                        "Geweldige website met uitgebreide informatie. Dankzij jullie 
+                        tips hebben we een perfecte vakantie gehad in Gdansk!"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-sage rounded-full flex items-center justify-center mr-4">
+                            <span class="font-bold text-white">SK</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Sophie Koster</p>
+                            <p class="opacity-80">Rotterdam</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Testimonials -->
+
+    <!-- @COMPONENT: Newsletter CTA -->
+    <section class="py-20 bg-sage text-white">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    Mis Geen Enkele Reis-Tip!
+                </h2>
+                <p class="text-xl mb-8 opacity-90">
+                    Ontvang maandelijks onze nieuwsbrief vol met geheime tips, 
+                    nieuwe bestemmingen en exclusieve aanbiedingen.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                    <input 
+                        type="email" 
+                        placeholder="Jouw e-mailadres"
+                        class="flex-1 px-6 py-4 rounded-full text-charcoal border-none outline-none text-lg"
+                        data-mock="true"
+                    >
+                    <button class="bg-primary text-white px-8 py-4 rounded-full hover:bg-white hover:text-primary transition-colors font-semibold whitespace-nowrap">
+                        Inschrijven
+                    </button>
+                </div>
+                
+                <p class="text-sm opacity-80 mt-4">
+                    <i class="fas fa-lock mr-1"></i>
+                    Je privacy is veilig bij ons. Geen spam, altijd uitschrijven mogelijk.
+                </p>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Newsletter CTA -->
+
+    <!-- @COMPONENT: Footer -->
+    <footer class="bg-primary text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-6">
+                        <i class="fas fa-mountain text-2xl"></i>
+                        <h3 class="text-2xl font-bold">Ontdek Polen</h3>
+                    </div>
+                    <p class="text-gray-300 mb-6">
+                        Jouw betrouwbare reisgids voor het ontdekken van 
+                        de mooiste plekken in Polen.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-sage transition-colors">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-sage transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-sage transition-colors">
+                            <i class="fab fa-youtube text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Bestemmingen</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-sage transition-colors">Krakow</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Gdansk</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Tatra Bergen</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Bialowieza</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Alle bestemmingen</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Reisgidsen</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-sage transition-colors">Stadsgidsen</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Roadtrips</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Natuurgidsen</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Cultuur & Historie</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Alle gidsen</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-sage transition-colors">Over ons</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Adverteren</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Privacy</a></li>
+                        <li><a href="#" class="hover:text-sage transition-colors">Voorwaarden</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-600 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Ontdek Polen. Alle rechten voorbehouden.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- @END_COMPONENT: Footer -->
+
+    <script>
+        // TODO: Implement search functionality
+        // TODO: Add smooth scrolling for navigation
+        // TODO: Implement newsletter subscription
+        // TODO: Add image lazy loading
+        // TODO: Implement mobile menu toggle
+        
+        (function() {
+            // Simple mobile menu toggle
+            const mobileMenuButton = document.querySelector('button.md\\:hidden');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', function() {
+                    // TODO: Toggle mobile menu visibility
+                    console.log('Mobile menu toggle clicked');
+                });
+            }
+            
+            // Simple smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

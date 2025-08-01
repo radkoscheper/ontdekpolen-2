@@ -19,6 +19,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { CreateHighlightDialog, EditHighlightDialog, ViewHighlightDialog, CreateDestinationDialog, CreateGuideDialog, CreateActivityDialog, EditActivityDialog, ViewActivityDialog } from '@/components/highlights-dialogs';
+import { DestinationImageManager } from '@/components/ui/cloudinary-destination-upload';
+import CloudinaryUpload from '@/components/ui/cloudinary-upload';
+import CloudinaryGallery from '@/components/ui/cloudinary-gallery';
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -126,9 +129,6 @@ export default function Admin() {
     enabled: isAuthenticated && currentUser?.canEditContent,
     retry: 1,
     staleTime: 0,
-    onError: (error) => {
-      toast({ title: "Fout", description: "Kon zoekconfiguratties niet laden", variant: "destructive" });
-    }
   });
 
   // Multi-platform deployment queries (admin only)
@@ -159,6 +159,8 @@ export default function Admin() {
   const [showEditUser, setShowEditUser] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [users, setUsers] = useState<any[]>([]);
+  const [galleryKey, setGalleryKey] = useState(0);
 
 
   
@@ -358,10 +360,27 @@ export default function Admin() {
   const [activityLocationFilter, setActivityLocationFilter] = useState<string>('all');
   const [activityCategoryFilter, setActivityCategoryFilter] = useState<string>('all');
 
+  // Safe data access with defaults
+  const destinationsData = destinationsQuery.data || [];
+  const guidesData = guidesQuery.data || [];
+  const deletedDestinations = deletedDestinationsQuery.data || [];
+  const deletedGuides = deletedGuidesQuery.data || [];
+  const trashedImages = trashedImagesQuery.data || [];
+  const motivationQueryData = motivationQuery.data || {};
+  const siteSettingsData = siteSettingsQuery.data || {};
+  const databaseStatus = databaseStatusQuery.data || {};
+  const tableStats = tableStatsQuery.data || [];
+  const templates = templatesQuery.data || [];
+  const pagesData = pagesQuery.data || [];
+  const homepagePages = homepagePagesQuery.data || [];
+  const deletedPagesData = deletedPagesQuery.data || [];
+  const highlightsData = highlightsQuery.data || [];
+  const activitiesData = activitiesQuery.data || [];
+  const searchConfigsData = searchConfigsQuery.data || [];
+
   // Get unique locations from destinations for filter
   const getUniqueLocations = () => {
-    if (!destinationsQuery.data) return [];
-    const locations = destinationsQuery.data
+    const locations = destinationsData
       .map((dest: any) => dest.location)
       .filter((location: string) => location && location.trim() !== '')
       .filter((location: string, index: number, arr: string[]) => arr.indexOf(location) === index)
@@ -371,8 +390,7 @@ export default function Admin() {
 
   // Get unique titles from guides for filter (first word)
   const getUniqueGuideCategories = () => {
-    if (!guidesQuery.data) return [];
-    const categories = guidesQuery.data
+    const categories = guidesData
       .map((guide: any) => {
         const firstWord = guide.title.split(' ')[0];
         return firstWord || 'Overig';
@@ -384,16 +402,14 @@ export default function Admin() {
 
   // Filter destinations by location
   const getFilteredDestinations = () => {
-    if (!destinationsQuery.data) return [];
-    if (locationFilter === 'all') return destinationsQuery.data;
-    return destinationsQuery.data.filter((dest: any) => dest.location === locationFilter);
+    if (locationFilter === 'all') return destinationsData;
+    return destinationsData.filter((dest: any) => dest.location === locationFilter);
   };
 
   // Filter guides by category
   const getFilteredGuides = () => {
-    if (!guidesQuery.data) return [];
-    if (guideFilter === 'all') return guidesQuery.data;
-    return guidesQuery.data.filter((guide: any) => {
+    if (guideFilter === 'all') return guidesData;
+    return guidesData.filter((guide: any) => {
       const firstWord = guide.title.split(' ')[0] || 'Overig';
       return firstWord === guideFilter;
     });
@@ -401,8 +417,7 @@ export default function Admin() {
 
   // Get unique locations from activities for filter
   const getUniqueActivityLocations = () => {
-    if (!activitiesQuery.data) return [];
-    const locations = activitiesQuery.data
+    const locations = activitiesData
       .map((activity: any) => activity.location)
       .filter((location: string) => location && location.trim() !== '')
       .filter((location: string, index: number, arr: string[]) => arr.indexOf(location) === index)
@@ -412,7 +427,6 @@ export default function Admin() {
 
   // Get unique categories from activities for filter
   const getUniqueActivityCategories = () => {
-    if (!activitiesQuery.data) return [];
     const categories = activitiesQuery.data
       .map((activity: any) => activity.category)
       .filter((category: string) => category && category.trim() !== '')

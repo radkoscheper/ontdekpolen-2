@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ontdek Polen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#f8f6f1',
+            'dark-green': '#2f3e46',
+            'dark-text': '#1f1f1f'
+          },
+          fontFamily: {
+            'inter': ['Inter', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-cream text-dark-text font-inter">
+  
+  <!-- @COMPONENT: HeroSection -->
+  <header class="relative bg-cover bg-center text-white py-24 px-5 text-center" style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&h=1080');">
+    <!-- Historic Polish architecture with cobblestone streets at sunset -->
+    <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+    <div class="relative z-10">
+      <h1 class="text-5xl font-bold mb-3" data-bind="site.title">Ontdek Polen</h1>
+      <p class="text-xl mb-5" data-bind="site.subtitle">Mooie plekken in Polen ontdekken</p>
+      
+      <div class="mt-5">
+        <input 
+          type="text" 
+          placeholder="Zoek bestemming" 
+          class="py-3 px-5 w-80 max-w-full border-none rounded-lg text-base text-dark-text"
+          data-implementation="Connect to search functionality"
+        >
+      </div>
+      
+      <button 
+        class="mt-5 bg-dark-green text-white py-3 px-6 border-none rounded-lg text-base cursor-pointer hover:bg-opacity-90 transition-all duration-200"
+        data-event="click:handlePlanTrip"
+      >
+        Plan je reis
+      </button>
+    </div>
+  </header>
+  <!-- @END_COMPONENT: HeroSection -->
+
+  <!-- @COMPONENT: DestinationGrid -->
+  <section class="py-16 px-5 max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">
+      <!-- @MAP: destinations.map(destination => ( -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300" data-mock="true">
+        <!-- Historic market square in Krakow with colorful buildings -->
+        <img 
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+          alt="Krakow" 
+          class="w-full h-40 object-cover"
+          data-bind="destination.image"
+        >
+        <div class="p-4 font-bold" data-bind="destination.name">Krakow</div>
+      </div>
+      
+      <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300" data-mock="true">
+        <!-- Snow-capped Tatra Mountains with alpine meadow -->
+        <img 
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+          alt="Tatra Mountains" 
+          class="w-full h-40 object-cover"
+          data-bind="destination.image"
+        >
+        <div class="p-4 font-bold" data-bind="destination.name">Tatra Mountains</div>
+      </div>
+      
+      <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300" data-mock="true">
+        <!-- Gdansk harbor with colorful historic buildings along waterfront -->
+        <img 
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+          alt="Gdansk" 
+          class="w-full h-40 object-cover"
+          data-bind="destination.image"
+        >
+        <div class="p-4 font-bold" data-bind="destination.name">Gdansk</div>
+      </div>
+      
+      <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300" data-mock="true">
+        <!-- Dense primeval forest with tall trees and misty atmosphere -->
+        <img 
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+          alt="Bialowieza" 
+          class="w-full h-40 object-cover"
+          data-bind="destination.image"
+        >
+        <div class="p-4 font-bold" data-bind="destination.name">Bialowieza</div>
+      </div>
+      <!-- @END_MAP )) -->
+    </div>
+  </section>
+  <!-- @END_COMPONENT: DestinationGrid -->
+
+  <!-- @COMPONENT: CTASection -->
+  <section class="py-16 px-5 max-w-6xl mx-auto">
+    <div class="flex flex-wrap gap-5 items-center justify-between">
+      <div class="flex-1 min-w-80">
+        <h2 class="text-3xl font-bold mb-4" data-bind="cta.title">Laat je verrassen door het onbekende Polen</h2>
+        <p class="text-lg mb-6" data-bind="cta.description">Bezoek historische steden, ontdek natuurparken en verborgen parels. Onze reisgidsen helpen je op weg!</p>
+        <button 
+          class="bg-dark-green text-white py-3 px-6 border-none rounded-lg text-base cursor-pointer hover:bg-opacity-90 transition-all duration-200"
+          data-event="click:handleReadGuides"
+        >
+          Lees onze gidsen
+        </button>
+      </div>
+      <div class="flex-1 min-w-80">
+        <!-- Scenic Tatra valley with mountain peaks and green meadows -->
+        <img 
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=400" 
+          alt="Tatra Valley" 
+          class="w-full rounded-xl shadow-lg"
+          data-bind="cta.image"
+        >
+      </div>
+    </div>
+  </section>
+  <!-- @END_COMPONENT: CTASection -->
+
+  <!-- @COMPONENT: TravelGuides -->
+  <section class="py-16 px-5 max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold mb-8" data-bind="guides.title">Reisgidsen en Tips</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- @MAP: guides.map(guide => ( -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300" data-mock="true">
+        <!-- Krakow Main Market Square with St. Mary's Basilica -->
+        <img 
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+          alt="3 Dagen in Krakau" 
+          class="w-full h-40 object-cover"
+          data-bind="guide.image"
+        >
+        <div class="p-4 font-bold" data-bind="guide.title">3 Dagen in Krakau</div>
+      </div>
+      
+      <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300" data-mock="true">
+        <!-- Winding mountain road through southern Poland countryside -->
+        <img 
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+          alt="Roadtrip door het zuiden" 
+          class="w-full h-40 object-cover"
+          data-bind="guide.image"
+        >
+        <div class="p-4 font-bold" data-bind="guide.title">Roadtrip door het zuiden</div>
+      </div>
+      
+      <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300" data-mock="true">
+        <!-- Polish Baltic coast with sandy beaches and dunes -->
+        <img 
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+          alt="Verborgen Parels" 
+          class="w-full h-40 object-cover"
+          data-bind="guide.image"
+        >
+        <div class="p-4 font-bold" data-bind="guide.title">Verborgen Parels aan zee</div>
+      </div>
+      <!-- @END_MAP )) -->
+    </div>
+  </section>
+  <!-- @END_COMPONENT: TravelGuides -->
+
+  <!-- @COMPONENT: Footer -->
+  <footer class="text-center py-10 px-5 bg-dark-green text-white">
+    <p data-bind="footer.copyright">&copy; 2025 Ontdek Polen. Alle rechten voorbehouden.</p>
+  </footer>
+  <!-- @END_COMPONENT: Footer -->
+
+  <script>
+    // TODO: Implement search functionality
+    // TODO: Implement trip planning logic
+    // TODO: Implement guide reading functionality
+    // TODO: Add proper image loading and error handling
+    // TODO: Implement responsive navigation if needed
+    // TODO: Add analytics tracking
+  </script>
+</body>
+</html>
