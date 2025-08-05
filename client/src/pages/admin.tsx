@@ -19,9 +19,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { CreateHighlightDialog, EditHighlightDialog, ViewHighlightDialog, CreateDestinationDialog, CreateGuideDialog, CreateActivityDialog, EditActivityDialog, ViewActivityDialog } from '@/components/highlights-dialogs';
-import { DestinationImageManager } from '@/components/ui/cloudinary-destination-upload';
-import CloudinaryUpload from '@/components/ui/cloudinary-upload';
-import CloudinaryGallery from '@/components/ui/cloudinary-gallery';
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -129,6 +126,9 @@ export default function Admin() {
     enabled: isAuthenticated && currentUser?.canEditContent,
     retry: 1,
     staleTime: 0,
+    onError: (error) => {
+      toast({ title: "Fout", description: "Kon zoekconfiguratties niet laden", variant: "destructive" });
+    }
   });
 
   // Multi-platform deployment queries (admin only)
@@ -159,8 +159,6 @@ export default function Admin() {
   const [showEditUser, setShowEditUser] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [users, setUsers] = useState<any[]>([]);
-  const [galleryKey, setGalleryKey] = useState(0);
 
 
   
@@ -360,27 +358,10 @@ export default function Admin() {
   const [activityLocationFilter, setActivityLocationFilter] = useState<string>('all');
   const [activityCategoryFilter, setActivityCategoryFilter] = useState<string>('all');
 
-  // Safe data access with defaults
-  const destinationsData = destinationsQuery.data || [];
-  const guidesData = guidesQuery.data || [];
-  const deletedDestinations = deletedDestinationsQuery.data || [];
-  const deletedGuides = deletedGuidesQuery.data || [];
-  const trashedImages = trashedImagesQuery.data || [];
-  const motivationQueryData = motivationQuery.data || {};
-  const siteSettingsData = siteSettingsQuery.data || {};
-  const databaseStatus = databaseStatusQuery.data || {};
-  const tableStats = tableStatsQuery.data || [];
-  const templates = templatesQuery.data || [];
-  const pagesData = pagesQuery.data || [];
-  const homepagePages = homepagePagesQuery.data || [];
-  const deletedPagesData = deletedPagesQuery.data || [];
-  const highlightsData = highlightsQuery.data || [];
-  const activitiesData = activitiesQuery.data || [];
-  const searchConfigsData = searchConfigsQuery.data || [];
-
   // Get unique locations from destinations for filter
   const getUniqueLocations = () => {
-    const locations = destinationsData
+    if (!destinationsQuery.data) return [];
+    const locations = destinationsQuery.data
       .map((dest: any) => dest.location)
       .filter((location: string) => location && location.trim() !== '')
       .filter((location: string, index: number, arr: string[]) => arr.indexOf(location) === index)
@@ -390,7 +371,8 @@ export default function Admin() {
 
   // Get unique titles from guides for filter (first word)
   const getUniqueGuideCategories = () => {
-    const categories = guidesData
+    if (!guidesQuery.data) return [];
+    const categories = guidesQuery.data
       .map((guide: any) => {
         const firstWord = guide.title.split(' ')[0];
         return firstWord || 'Overig';
@@ -402,14 +384,16 @@ export default function Admin() {
 
   // Filter destinations by location
   const getFilteredDestinations = () => {
-    if (locationFilter === 'all') return destinationsData;
-    return destinationsData.filter((dest: any) => dest.location === locationFilter);
+    if (!destinationsQuery.data) return [];
+    if (locationFilter === 'all') return destinationsQuery.data;
+    return destinationsQuery.data.filter((dest: any) => dest.location === locationFilter);
   };
 
   // Filter guides by category
   const getFilteredGuides = () => {
-    if (guideFilter === 'all') return guidesData;
-    return guidesData.filter((guide: any) => {
+    if (!guidesQuery.data) return [];
+    if (guideFilter === 'all') return guidesQuery.data;
+    return guidesQuery.data.filter((guide: any) => {
       const firstWord = guide.title.split(' ')[0] || 'Overig';
       return firstWord === guideFilter;
     });
@@ -417,7 +401,8 @@ export default function Admin() {
 
   // Get unique locations from activities for filter
   const getUniqueActivityLocations = () => {
-    const locations = activitiesData
+    if (!activitiesQuery.data) return [];
+    const locations = activitiesQuery.data
       .map((activity: any) => activity.location)
       .filter((location: string) => location && location.trim() !== '')
       .filter((location: string, index: number, arr: string[]) => arr.indexOf(location) === index)
@@ -427,6 +412,7 @@ export default function Admin() {
 
   // Get unique categories from activities for filter
   const getUniqueActivityCategories = () => {
+    if (!activitiesQuery.data) return [];
     const categories = activitiesQuery.data
       .map((activity: any) => activity.category)
       .filter((category: string) => category && category.trim() !== '')
@@ -3202,7 +3188,7 @@ export default function Admin() {
                       </div>
                       
                       <div className="flex items-center gap-3">
-                        <Database className="h-5 w-5 text-orange-500" />
+                        <Database className="h-5 w-5 text-green-500" />
                         <div>
                           <p className="text-sm font-medium">Storage</p>
                           <p className="text-lg font-semibold">{databaseStatusQuery.data.storageSize}</p>
@@ -3401,8 +3387,8 @@ export default function Admin() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100">
-                          <Clock className="h-5 w-5 text-orange-600" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100">
+                          <Clock className="h-5 w-5 text-green-600" />
                         </div>
                         <div>
                           <p className="text-sm font-medium">Uptime</p>
@@ -4386,7 +4372,7 @@ Status: ${settings.status}`;
                     <div className="text-sm text-gray-600">Homepage Bestemmingen</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">
+                    <div className="text-2xl font-bold text-green-600">
                       {(destinationsQuery.data?.filter((d: any) => d.featured).length || 0) + 
                        (activitiesQuery.data?.filter((a: any) => a.featured).length || 0)}
                     </div>
@@ -7802,7 +7788,7 @@ function TemplateManagement() {
         <Card>
           <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-orange-600">{templates.filter(t => !t.isActive).length}</p>
+              <p className="text-2xl font-bold text-green-600">{templates.filter(t => !t.isActive).length}</p>
               <p className="text-sm text-gray-600">Inactieve Templates</p>
             </div>
           </CardContent>
@@ -8619,10 +8605,10 @@ function EditPageDialog({ open, onOpenChange, page, templates, onPageUpdated }: 
                   
                   {/* Exacte tekst zoals in echte header */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center z-10">
-                    <h1 className="text-xl font-bold mb-2 font-inter">
+                    <h1 className="text-xl font-bold mb-2 font-luxury-serif">
                       Ontdek Polen
                     </h1>
-                    <p className="text-base opacity-90 font-inter">
+                    <p className="text-base opacity-90 font-croatia-body">
                       Mooie plekken in {formData.title} ontdekken
                     </p>
                   </div>
@@ -8917,7 +8903,7 @@ function PageManagement({ templates }: { templates: any[] }) {
         <Card>
           <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-orange-600">{deletedPages.length}</p>
+              <p className="text-2xl font-bold text-green-600">{deletedPages.length}</p>
               <p className="text-sm text-gray-600">In Prullenbak</p>
             </div>
           </CardContent>

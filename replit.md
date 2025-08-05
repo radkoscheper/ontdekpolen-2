@@ -1,66 +1,64 @@
 # Ontdek Polen - Polish Travel Website
 
 ## Overview
-"Ontdek Polen" is a full-stack web application designed to showcase Polish destinations and travel guides. It aims to be a comprehensive resource for discovering beautiful places in Poland, offering dynamic content management for destinations, guides, and site-wide settings. The project prioritizes a modern user experience with a Dutch interface, robust content management capabilities, and a scalable architecture. The business vision is to provide a go-to platform for Polish travel, with potential for template sales and rapid deployment for similar content-driven websites.
 
-## Recent Major Restoration (August 2025)
-Successfully restored and enhanced the platform after aggressive cleanup, merging backup files with current codebase to create the most comprehensive version to date. Key improvements include:
-- Unified luxury design aesthetic with navy/gold color scheme throughout all components
-- Complete CMS functionality restoration with advanced Cloudinary integration
-- Enhanced homepage styling with glassmorphism effects and modern card layouts
-- Full TypeScript error resolution and code optimization
-- Comprehensive backup validation ensuring no functionality loss
+"Ontdek Polen" is a full-stack web application designed to showcase Polish destinations, provide travel guides, and share information about various locations across Poland. The project aims to be a comprehensive travel website with a modern user experience and robust content management capabilities. Key capabilities include multi-user authentication with role-based permissions, integration with a PostgreSQL database, a comprehensive CMS for destinations and guides, a full backup/restore system with soft delete, dynamic image management, and extensive site settings. The platform supports a fully dynamic templating and pages system for scalable content creation and is designed for production deployment, including Vercel hosting. The site now features a luxury loading screen with Polish branding and smooth transitions. The long-term vision is to establish a leading online resource for Polish tourism, with potential for template sales and rapid project replication.
 
 ## User Preferences
+
 Preferred communication style: Simple, everyday language.
 Language: Dutch (Nederlands) - User prefers communication in Dutch.
-Development approach: Milestone-based development with backup points (Stadium 1, Stadium 2, etc.)
+Development approach: Milestone-based development with backup points.
 Backup strategy: Create stable checkpoints before major changes for easy rollback capability.
+Fallback documentation: Maintain REPLIT_FALLBACK_DOCUMENTATION.md for critical system understanding and error prevention.
+Chat organization: Use structured phase documentation system with clear milestones, session summaries, and progress tracking for easy navigation through development history.
 
 ## System Architecture
 
 ### UI/UX Decisions
-The website features a modern, responsive design with a mobile-first approach. It utilizes a luxury design aesthetic inspired by "Visit Croatia," incorporating a navy (#1a365d) and gold (#d4af37) color scheme, and elegant typography (Playfair Display/Cormorant Garamond fonts). All components now feature uniform styling for consistency. Key UI/UX decisions include:
-- Consistent header structure and styling across all pages.
-- Dynamic background images and SEO metadata loaded from the CMS.
-- Homepage-style headers and consistent padding across all template pages.
-- Modernized search functionality with larger input fields and glassmorphism effects.
-- Enhanced card layouts with image previews and consistent button styling.
-- Integration of travel sliders for efficient content display on various pages.
-- AI-optimized header image transformations via Cloudinary for enhanced visual quality.
-- Visit Norway-inspired loading screens that dynamically display content from the CMS.
-- Multi-tab CMS interface (Details, Cloudinary, Rich Text, SEO & Meta) for comprehensive content management.
-- Custom SVG icons for an authentic Polish travel experience.
-- Uniform luxury card styling across homepage, destinations, activities, and guides sections.
-- Enhanced CTA sections with cream backgrounds and luxury button designs with MapPin/Calendar icons.
+The website features a consistent, modern, and responsive design with a mobile-first approach. All pages, including templates, maintain a uniform header structure, consistent padding, button styling, and layout positioning. Visual consistency is a high priority, with standardized meta titles (`{{title}} - Ontdek Polen`) and location-specific meta descriptions for improved SEO. A luxury loading screen with dark gradient background, golden "P" logo, animated rings, and bouncing dots provides professional page transitions. 
+
+**Hero Section Design**: The homepage features a stunning full-screen Hero Section with WebsiteBuilder luxury styling, including large Playfair Display typography (80px mobile, 112px desktop), gradient overlay (navy-dark with varying opacity), centered search bar with rounded-full design and backdrop-blur effects, and elegant CTA buttons with hover animations. Complete configuration documented in HERO_SECTION_CONFIGURATION.md for future reference.
+
+**Typography System**: Consistent 2-font system implemented across all pages - Playfair Display (serif) for headings and titles, Inter (sans-serif) for body text and descriptions. Removed Cormorant Garamond and other inconsistent fonts. All pages now use font-playfair for headings and font-croatia-body for body text, ensuring visual consistency and professional appearance throughout the site.
+
+A custom travel slider component is implemented using `embla-carousel-react` for enhanced content browsing on the homepage, destination pages, and discovery sections, featuring responsive layouts (1-4 items visible based on screen size) and navigation arrows. Custom SVG icons are extensively used to provide an authentic Polish travel experience. The admin panel is designed for clarity and ease of use, with personalized greetings, logical grouping of features (e.g., Administrator vs. Website Onderdelen), and clear status indicators.
 
 ### Technical Implementations
-- **Frontend**: React 18 with TypeScript, Vite for bundling, Tailwind CSS for styling (with shadcn/ui), TanStack Query for state management, Wouter for routing, and React Hook Form with Zod for forms.
-- **Backend**: Node.js with Express.js (TypeScript ESM modules), Drizzle ORM for PostgreSQL operations, and connect-pg-simple for session management.
-- **Data Models**: Comprehensive CMS with models for Users (multi-role), Destinations, Guides, Pages, Templates, Site Settings, all supporting soft delete and versioning.
-- **Image Management**: Integrated with Cloudinary for professional image handling, including automatic compression, WebP conversion, smart naming, and CDN delivery. Local images have been fully migrated to Cloudinary.
-- **Search System**: Extensible search bar CMS with support for homepage, destination, global, highlights, and guides scopes.
-- **Authentication**: Robust multi-user authentication with role-based permissions and optimized login flow.
-- **File Management**: Automated file renaming, organized folder structures (e.g., `/images/headers/`, `/images/destinations/`), and a clean project structure.
-- **Deployment**: Configured for Vercel deployment, with optimized build processes (Vite + ESBuild) and environment variable management.
+The application utilizes a React 18 frontend with TypeScript, built using Vite and styled with Tailwind CSS and shadcn/ui. State management is handled by TanStack Query, and routing by Wouter. Form handling is managed with React Hook Form and Zod for validation. The backend is built with Node.js and Express.js, using TypeScript (ESM modules). PostgreSQL is the chosen database, with Drizzle ORM for database operations and connect-pg-simple for session management. The system supports dynamic content rendering, with page content and SEO metadata loaded from the CMS. It includes an automatic file renaming system for uploaded images based on location names and ensures data consistency between the database and file system. A unified upload system centralizes file handling and validation. Authentication flow is optimized for seamless login with immediate UI updates. All internal links are prioritized over external ones, ensuring a cohesive user experience within the site.
 
 ### Feature Specifications
-- **Content Management System (CMS)**: Comprehensive CMS with CRUD operations for destinations, guides, pages, and templates. Includes features like homepage visibility toggles, dynamic SEO metadata, and a full backup/restore system with a recycle bin.
-- **Dynamic Content**: All site settings, content, and images are dynamically loaded from the CMS and database.
-- **Internal Linking**: A robust internal link structure ensures seamless navigation between homepage, activity details, and destination pages, with automatic scrolling to relevant sections.
-- **Database Monitoring**: An admin-only dashboard provides real-time database status, table statistics, and secure monitoring of the Neon PostgreSQL database.
-- **Scalability**: Designed to automatically generate destination pages from database entries, eliminating the need for manual page creation for each new destination.
+- **Multi-user Authentication**: Role-based permissions (admin/editor/viewer) with optimized login/logout flow.
+- **CMS**: Comprehensive content management for destinations, guides, pages, site settings, and search configurations. Supports soft delete, content archiving, and dynamic content injection.
+- **Dynamic Templating System**: Reusable templates with variable support, allowing for rapid creation of new pages and destinations.
+- **Image Management**: Integrated system for managing header images, including a professional image cropping tool with predefined aspect ratios, live preview, and automatic upload to destination-specific folders. Dynamic favicon management is also supported.
+- **Homepage Controls**: Granular control over which destinations and guides appear on the homepage with real-time updates.
+- **Search Functionality**: Configurable search bar with multiple scopes (homepage, destination, global, highlights, guides) and category indicators in search results.
+- **Content Expansion**: Extensive content library with 40 destinations and 93 activities, linked and optimized for location-specific filtering.
+- **Database Monitoring Dashboard**: Admin-only panel for live database connection monitoring, comprehensive statistics, and table overviews with auto-refresh.
+- **Deployment-Ready**: Configured for Vercel deployment with optimized build processes, proper environment variable handling, and robust documentation for multi-platform hosting.
+
+### System Design Choices
+The project follows a monorepo structure with shared code between the client and server. Content is managed through a JSON-based CMS, with a CLI interface for generation and management. A clean architecture separates frontend and backend concerns, and Drizzle ORM ensures type-safe database operations. A soft delete mechanism is implemented across all major data models for content recovery. All 40 destinations have dedicated, rich content pages, and a smart fallback system prioritizes destination-specific routes, reducing redundant page lookups. The system is designed for scalability, allowing new destinations to automatically integrate without manual page creation.
 
 ## External Dependencies
 
-- **Neon Database**: Serverless PostgreSQL database for primary data storage.
-- **Cloudinary**: Cloud-based media management platform for image storage, optimization, and delivery.
-- **Radix UI**: Primitive components for accessible UI elements.
-- **Tailwind CSS**: Utility-first CSS framework for styling.
-- **Lucide React**: Icon library for UI elements.
-- **TanStack Query (React Query)**: For server state management and data fetching.
-- **Embla Carousel React**: Library used for implementing travel sliders.
-- **React Hook Form** and **Zod**: For form handling and validation.
-- **React-image-crop**: For in-browser image cropping functionality.
-- **Drizzle ORM**: Type-safe ORM for database interactions.
-- **ESBuild**: Fast bundler used for the backend server code.
+- **Neon Database**: Serverless PostgreSQL database for persistent data storage.
+- **React**: Frontend JavaScript library.
+- **Vite**: Frontend build tool.
+- **Tailwind CSS**: Utility-first CSS framework.
+- **shadcn/ui**: Component library built on Radix UI.
+- **TanStack Query (React Query)**: Data fetching and state management for React.
+- **Wouter**: Lightweight client-side router for React.
+- **React Hook Form**: Form management library.
+- **Zod**: Schema validation library.
+- **Node.js**: Backend JavaScript runtime.
+- **Express.js**: Backend web framework.
+- **Drizzle ORM**: TypeScript ORM for database interactions.
+- **connect-pg-simple**: PostgreSQL session store for Express.
+- **multer**: Node.js middleware for handling multipart/form-data.
+- **react-image-crop**: Image cropping library for React.
+- **embla-carousel-react**: Carousel library for React.
+- **Lucide React**: Icon library.
+- **ESBuild**: Fast JavaScript bundler.
+- **TypeScript**: Programming language for type safety.

@@ -54,90 +54,79 @@ export function CloudinaryGallery({
     { value: 'nightlife', label: '🌙 Nachtleven' },
   ];
 
-  const loadImages = async () => {
+  // Fetch images from Cloudinary via our backend
+  const fetchImages = async () => {
     try {
       setLoading(true);
+      setError(null);
       
-      // NEW: Clean hierarchical folder structure
       const searchFolder = destinationName 
-        ? `${folder}/destinations/${destinationName.toLowerCase()}/${selectedCategory}`
-        : folder;
+        ? `${folder}/${destinationName}/${selectedCategory}`
+        : `${folder}/${selectedCategory}`;
       
-      const response = await fetch(`/api/upload/cloudinary/list/${encodeURIComponent(searchFolder)}`);
+      const response = await fetch(`/api/admin/cloudinary/images?folder=${encodeURIComponent(searchFolder)}&max_results=${maxItems}`);
       
       if (!response.ok) {
-        throw new Error('Failed to load images');
+        throw new Error(`Failed to fetch images: ${response.statusText}`);
       }
-
-      const result = await response.json();
-      setImages(result.data?.slice(0, maxItems) || []);
-      setError(null);
+      
+      const data = await response.json();
+      setImages(data.resources || []);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load images';
-      setError(errorMessage);
-      toast({
-        title: 'Laden mislukt',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      console.error('Error fetching Cloudinary images:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadImages();
-  }, [folder, destinationName, selectedCategory, maxItems]);
-
-  // Listen for refresh events from upload components
-  useEffect(() => {
-    const handleRefresh = () => {
-      loadImages();
-    };
-    
-    window.addEventListener('cloudinary-gallery-refresh', handleRefresh);
-    return () => window.removeEventListener('cloudinary-gallery-refresh', handleRefresh);
-  }, []);
-
-  const handleDelete = async (publicId: string) => {
-    if (!confirm('Weet je zeker dat je deze afbeelding wilt verwijderen?')) {
-      return;
-    }
-
+  // Delete image from Cloudinary
+  const deleteImage = async (publicId: string) => {
     try {
-      const response = await fetch(`/api/upload/cloudinary/${encodeURIComponent(publicId)}`, {
-        method: 'DELETE',
+      const response = await fetch('/api/admin/cloudinary/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ public_id: publicId }),
       });
 
       if (!response.ok) {
-        throw new Error('Delete failed');
+        throw new Error(`Failed to delete image: ${response.statusText}`);
       }
 
+      // Remove from local state
+      setImages(prev => prev.filter(img => img.public_id !== publicId));
+      
       toast({
-        title: 'Verwijderd',
-        description: 'Afbeelding succesvol verwijderd van Cloudinary',
+        title: "Afbeelding verwijderd",
+        description: "De afbeelding is succesvol verwijderd van Cloudinary",
       });
-
-      // Refresh the gallery
-      loadImages();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Delete failed';
       toast({
-        title: 'Verwijderen mislukt',
-        description: errorMessage,
-        variant: 'destructive',
+        title: "Error",
+        description: err instanceof Error ? err.message : 'Failed to delete image',
+        variant: "destructive",
       });
     }
   };
 
-  const copyUrl = (url: string) => {
-    navigator.clipboard.writeText(url);
-    toast({
-      title: 'URL gekopieerd',
-      description: 'Afbeelding URL is gekopieerd naar klembord',
-    });
+  // Copy URL to clipboard
+  const copyUrl = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({
+        title: "URL gekopieerd",
+        description: "De afbeelding URL is gekopieerd naar het klembord",
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Kon URL niet kopiëren",
+        variant: "destructive",
+      });
+    }
   };
 
+  // Format file size
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -146,25 +135,21 @@ export function CloudinaryGallery({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('nl-NL', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  // Fetch images when component mounts or category changes
+  useEffect(() => {
+    fetchImages();
+  }, [selectedCategory, destinationName, folder, maxItems]);
 
   if (loading) {
     return (
       <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center h-32">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-              <p className="text-sm text-gray-500">Laden van afbeeldingen...</p>
-            </div>
+        <CardHeader>
+          <CardTitle>Cloudinary Gallery</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <span className="ml-2">Afbeeldingen laden...</span>
           </div>
         </CardContent>
       </Card>
@@ -174,26 +159,14 @@ export function CloudinaryGallery({
   if (error) {
     return (
       <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-red-600">
-            <p>Fout bij laden: {error}</p>
-            <Button onClick={loadImages} className="mt-2" variant="outline">
+        <CardHeader>
+          <CardTitle>Cloudinary Gallery</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <p className="text-red-600 mb-4">Error: {error}</p>
+            <Button onClick={fetchImages} variant="outline">
               Opnieuw proberen
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (images.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-gray-500">
-            <p>Geen afbeeldingen gevonden in folder: {folder}</p>
-            <Button onClick={loadImages} className="mt-2" variant="outline">
-              Vernieuwen
             </Button>
           </div>
         </CardContent>
@@ -204,17 +177,12 @@ export function CloudinaryGallery({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Cloudinary Gallery ({images.length})</span>
-          <Button onClick={loadImages} variant="outline" size="sm">
-            Vernieuwen
-          </Button>
-        </CardTitle>
-        {showCategoryFilter && destinationName && (
-          <div className="mt-4">
-            <Label htmlFor="gallery-category">Filter op Categorie</Label>
+        <CardTitle>Cloudinary Gallery</CardTitle>
+        {showCategoryFilter && (
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="category">Categorie:</Label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger>
+              <SelectTrigger className="w-48">
                 <SelectValue placeholder="Selecteer categorie" />
               </SelectTrigger>
               <SelectContent>
@@ -225,44 +193,43 @@ export function CloudinaryGallery({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-gray-500 mt-1">
-              Bekijk afbeeldingen uit: {destinationName.toLowerCase()}/{selectedCategory}/
-            </p>
           </div>
         )}
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 gap-6">
-          {images.map((image) => (
-            <div key={image.public_id} className="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-              <div className="aspect-[5/2] bg-gray-100 relative">
-                <img
-                  src={image.secure_url}
-                  alt={image.public_id}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              </div>
-              
-              <div className="p-4 space-y-3">
-                <div className="text-sm">
-                  <p className="font-semibold text-gray-800 truncate" title={image.public_id}>
+        {images.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">
+              Geen afbeeldingen gevonden in {destinationName ? `${destinationName}/${selectedCategory}` : selectedCategory}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {images.map((image) => (
+              <div key={image.public_id} className="border rounded-lg p-4 bg-white shadow-sm">
+                <div className="relative mb-3">
+                  <img
+                    src={image.secure_url}
+                    alt={image.public_id}
+                    className="w-full h-32 object-cover rounded"
+                    loading="lazy"
+                  />
+                </div>
+                
+                <div className="space-y-2 text-sm text-gray-600">
+                  <p className="font-medium truncate" title={image.public_id}>
                     {image.public_id.split('/').pop()}
                   </p>
-                  <p className="text-gray-600 text-base">
-                    {image.width}×{image.height} • {formatFileSize(image.bytes)}
-                  </p>
-                  <p className="text-gray-500 text-sm">
-                    {formatDate(image.created_at)}
-                  </p>
+                  <p>{image.width} × {image.height} px</p>
+                  <p>{formatFileSize(image.bytes)} • {image.format.toUpperCase()}</p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex gap-2 mt-3">
                   {showSelectButton && onImageSelect && (
                     <Button
                       size="sm"
                       onClick={() => onImageSelect(image)}
-                      className="flex-1 text-sm"
+                      className="flex-1"
                     >
                       Selecteren
                     </Button>
@@ -272,38 +239,39 @@ export function CloudinaryGallery({
                     size="sm"
                     variant="outline"
                     onClick={() => copyUrl(image.secure_url)}
-                    title="URL kopiëren"
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="h-4 w-4" />
                   </Button>
                   
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => window.open(image.secure_url, '_blank')}
-                    title="Openen in nieuwe tab"
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <ExternalLink className="h-4 w-4" />
                   </Button>
                   
                   {showDeleteButton && (
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => handleDelete(image.public_id)}
-                      title="Verwijderen"
+                      onClick={() => deleteImage(image.public_id)}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   )}
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
+        
+        <div className="mt-4 text-center">
+          <Button onClick={fetchImages} variant="outline">
+            Vernieuwen
+          </Button>
         </div>
       </CardContent>
     </Card>
   );
 }
-
-export default CloudinaryGallery;

@@ -11,6 +11,7 @@ import { insertUserSchema, updateUserSchema, changePasswordSchema, resetPassword
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { cloudinaryService } from "./cloudinary";
 
 declare module "express-session" {
   interface SessionData {
@@ -29,13 +30,8 @@ const requireAuth = (req: any, res: any, next: any) => {
 };
 
 // Configure multer for file uploads
-// Note: On Vercel (serverless), file system is read-only
-// This will work in development but not in production
 const uploadsDir = path.join(process.cwd(), 'client', 'public', 'images');
-const isProduction = process.env.NODE_ENV === 'production';
-const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
-
-if (!isProduction && !isServerless && !fs.existsSync(uploadsDir)) {
+if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
@@ -201,13 +197,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Image upload route with error handling
   app.post("/api/upload", requireAuth, (req, res) => {
-    // Check if we're in a serverless environment where uploads are not supported
-    if (isServerless || isProduction) {
-      return res.status(501).json({ 
-        message: "Upload functionaliteit is niet beschikbaar op Vercel (serverless omgeving). Gebruik lokale development of integreer externe opslag zoals Cloudinary.",
-        details: "Vercel serverless functions hebben een read-only bestandssysteem. Zie VERCEL_UPLOAD_ISSUE.md voor oplossingen."
-      });
-    }
     console.log("Upload route hit by user:", req.session.userId);
     
     upload.single('image')(req, res, async (err) => {
@@ -1763,28 +1752,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Favicon upload endpoint - specific for .ico files
-  app.post('/api/upload/favicon', requireAuth, (req, res) => {
-    // Check if we're in a serverless environment where uploads are not supported
-    if (isServerless || isProduction) {
-      return res.status(501).json({ 
-        message: "Upload functionaliteit is niet beschikbaar op Vercel (serverless omgeving). Gebruik lokale development of integreer externe opslag zoals Cloudinary.",
-        details: "Vercel serverless functions hebben een read-only bestandssysteem. Zie VERCEL_UPLOAD_ISSUE.md voor oplossingen."
-      });
+  app.post('/api/upload/favicon', requireAuth, faviconUpload.single('favicon'), (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No favicon file uploaded' });
     }
     
-    // Only proceed with upload if not in serverless environment
-    faviconUpload.single('favicon')(req, res, (err) => {
-      if (err) {
-        return res.status(400).json({ message: err.message });
-      }
-      
-      if (!req.file) {
-        return res.status(400).json({ message: 'No favicon file uploaded' });
-      }
-      
-      const faviconPath = `/${req.file.filename}`;
-      res.json({ faviconPath });
-    });
+    const faviconPath = `/${req.file.filename}`;
+    res.json({ faviconPath });
   });
 
   // Get available favicon files
@@ -3327,7 +3301,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         connectionTimeout, 
         idleTimeout, 
         region, 
-        projectId 
+        projectId, 
+        status 
       } = req.body;
 
       // Validate required fields
@@ -3348,7 +3323,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         connectionTimeout: parseInt(connectionTimeout),
         idleTimeout: parseInt(idleTimeout),
         region,
-        projectId
+        projectId,
+        status,
+        updatedAt: new Date()
       });
 
       res.json({
@@ -3383,6 +3360,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: "Database connectie test mislukt",
         error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Cloudinary Gallery API routes
+  app.get("/api/admin/cloudinary/images", requireAuth, async (req, res) => {
+    try {
+      const folder = req.query.folder as string || 'ontdek-polen';
+      const maxResults = parseInt(req.query.max_results as string) || 20;
+      
+      const result = await cloudinaryService.listImages(folder, maxResults);
+      res.json(result);
+    } catch (error) {
+      console.error('Cloudinary list error:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch images', 
+        message: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  app.post("/api/admin/cloudinary/delete", requireAuth, async (req, res) => {
+    try {
+      const { public_id } = req.body;
+      
+      if (!public_id) {
+        return res.status(400).json({ error: 'Public ID is required' });
+      }
+      
+      const result = await cloudinaryService.deleteImage(public_id);
+      res.json(result);
+    } catch (error) {
+      console.error('Cloudinary delete error:', error);
+      res.status(500).json({ 
+        error: 'Failed to delete image', 
+        message: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // Alternative API endpoints for frontend compatibility
+  app.get("/api/upload/cloudinary/list/:folder", requireAuth, async (req, res) => {
+    try {
+      const folder = decodeURIComponent(req.params.folder);
+      const maxResults = parseInt(req.query.max_results as string) || 20;
+      
+      const result = await cloudinaryService.listImages(folder, maxResults);
+      res.json({ data: result.resources });
+    } catch (error) {
+      console.error('Cloudinary list error:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch images', 
+        message: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  app.delete("/api/upload/cloudinary/:publicId", requireAuth, async (req, res) => {
+    try {
+      const publicId = decodeURIComponent(req.params.publicId);
+      
+      const result = await cloudinaryService.deleteImage(publicId);
+      res.json(result);
+    } catch (error) {
+      console.error('Cloudinary delete error:', error);
+      res.status(500).json({ 
+        error: 'Failed to delete image', 
+        message: error instanceof Error ? error.message : 'Unknown error' 
       });
     }
   });
